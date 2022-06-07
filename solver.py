@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import random
 
 def skill_to_int(skill_string):
     skill = 0
@@ -45,13 +46,40 @@ def print_table(table):
     for i in range(len(table)):
         print(table[i])
 
+def init_empty_solution():
+    solution = []
+    solution[0] = ['id', '8h', '8h30', '9h', '9h30', '10h', '10h30', '11h', '11h30', '12h', '12h30', '13h', '13h30']
+
+# Ex : 8h to 0, 9.5h to 3
+def hour_to_solution_index(hour):
+    return (int)(hour * 2) - 15
+
+def has_mission_between(hour1, hour2, employee, solution):
+    start_index = hour_to_solution_index(hour1)
+    end_index = hour_to_solution_index(hour2)
+
+    for i in range(start_index, end_index):
+        if solution[employee["id"]][i] != 0: return True
+
+def assign_mission(mission, employee, solution):
+
+    if has_mission_between(mission["start_hour"], mission["end_hour"], employee, solution): return False
+
+    start_index = hour_to_solution_index(mission["start_hour"])
+    end_index = hour_to_solution_index(mission["end_hour"])
+
+    for i in range(start_index, end_index):
+        solution[employee["id"]][i] = mission["id"]
+
+    return True
+
 csv_dir = r'./csv/45-4/'
 distances_csv = pd.read_csv(csv_dir + r'/Distances.csv', header=None)
 missions_csv = pd.read_csv(csv_dir + r'/Missions.csv', header=None).transpose()
 employees_csv = pd.read_csv(csv_dir + r'/Intervenants.csv', header=None).transpose()
 
 def distance_btw_missions(mission1, mission2):
-    return distances_csv[mission1][mission2]
+    return distances_csv[mission1["id"]][mission2["id"]]
 
 missions = []
 for i in range(missions_csv.shape[1]):
@@ -63,9 +91,8 @@ for i in range(employees_csv.shape[1]):
 
 lsf_missions = [missions[i] for i in range(len(missions)) if missions[i]["skill"] == 0]
 lcp_missions = [missions[i] for i in range(len(missions)) if missions[i]["skill"] == 1]
-
-
-print_table(employees)
+lsf_employees = [employees[i] for i in range(len(employees)) if employees[i]["skill"] == 0]
+lcp_employees = [employees[i] for i in range(len(employees)) if employees[i]["skill"] == 1]
 
 solutions = []
 for day in range(1, 6):
@@ -73,4 +100,10 @@ for day in range(1, 6):
     lcp_day_missions = [lcp_missions[k] for k in range(len(lcp_missions)) if lcp_missions[k]["day"] == day]
 
     print_table(lsf_day_missions)
+    print_table(lsf_employees)
+
+    random.shuffle(lsf_employees)
+
+    for i in range(lsf_employees):
+        assign_mission()
 
