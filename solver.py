@@ -4,7 +4,9 @@ import random
 import src.solution as sol
 import src.fitness as fit
 
-csv_dir = r'./csv/45-4/'
+week_days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi']
+
+csv_dir = r'./csv/96-6/'
 distances_csv = pd.read_csv(csv_dir + r'/Distances.csv', header=None)
 missions_csv = pd.read_csv(csv_dir + r'/Missions.csv', header=None).transpose()
 employees_csv = pd.read_csv(csv_dir + r'/Intervenants.csv', header=None).transpose()
@@ -27,7 +29,7 @@ lcp_employees = [employees[i] for i in range(len(employees)) if employees[i]["sk
 
 population = [[[]]]
 
-population[0] = sol.init_empty_solution(4)
+population[0] = sol.init_empty_solution(len(employees))
 
 for day in range(1, 6):
     lsf_day_missions = [lsf_missions[k] for k in range(len(lsf_missions)) if lsf_missions[k]["day"] == day]
@@ -49,6 +51,8 @@ for day in range(1, 6):
                 break
         day_mission_index += 1
     
+    print('\n' + week_days[day-1])
     sol.print_day(population[0][day])
 
-print(fit.fitness(population[0]))
+print()
+print(fit.all_lunch_pauses(population[0]))

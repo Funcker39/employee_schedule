@@ -55,14 +55,14 @@ def translate_employee(csv_row):
 
 # Ex : 8h to 0, 9.5h to 3
 def hour_to_solution_index(hour):
-    return (int)(hour * 2) - 16
+    return (int)(hour * 2) - 15
 
 def has_mission_between(hour1, hour2, employee, day):
     start_index = hour_to_solution_index(hour1)
     end_index = hour_to_solution_index(hour2)
 
     for i in range(start_index, end_index):
-        if day[employee["id"] - 1][i + 1] != 0: return True
+        if day[employee["id"] - 1][i] != 0: return True
 
 def assign_mission(mission, employee, day):
     if has_mission_between(mission["start_hour"], mission["end_hour"], employee, day): return False
@@ -71,7 +71,7 @@ def assign_mission(mission, employee, day):
     end_index = hour_to_solution_index(mission["end_hour"])
 
     for i in range(start_index, end_index):
-        day[employee["id"] - 1][i + 1] = mission["id"]
+        day[employee["id"] - 1][i] = mission["id"]
 
     return True
 

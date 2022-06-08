@@ -10,9 +10,18 @@ def all_lunch_pauses(solution):
                 if (solution[day][employee_ind][i] == 0):
                     if (solution[day][employee_ind][i+1] == 0):
                         has_pause = True
-            if not has_pause: return False, employee_ind+1, day
+                        
+            if not has_pause: 
+                for i in range(start_lunch_index, end_lunch_index):
+                    print (solution[day][employee_ind][i])
+                return False, employee_ind+1, day+1
+
+    return True
 
 def fitness(solution):
-    if not all_lunch_pauses(solution): return -1
-    
+    if not all_lunch_pauses(solution): 
+        return -1
+
     score = 0
+
+    return score
