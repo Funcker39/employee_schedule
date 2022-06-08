@@ -46,9 +46,26 @@ def print_table(table):
     for i in range(len(table)):
         print(table[i])
 
-def init_empty_solution():
-    solution = []
-    solution[0] = ['id', '8h', '8h30', '9h', '9h30', '10h', '10h30', '11h', '11h30', '12h', '12h30', '13h', '13h30']
+def print_solution(sol):
+    header = ['id', '8h', '8h30', '9h', '9h30', '10h', '10h30', '11h', '11h30', '12h', 
+                '12h30', '13h', '13h30', '14h30', '15h', '15h30', '16h', '16h30', '17h', '17h30',
+                '18h', '18h30', '19h', '19h30']
+    #_sol = sol
+    _sol = np.vstack([header, sol])
+    s = [[str(e) for e in row] for row in _sol]
+    lens = [max(map(len, col)) for col in zip(*s)]
+    fmt = '\t'.join('{{:{}}}'.format(x) for x in lens)
+    table = [fmt.format(*row) for row in s]
+    print ('\n'.join(table))
+    return
+
+def init_empty_solution(employees_count):
+    solution = [[0 for _ in range(24)] for _ in range(employees_count)]
+    
+    for i in range(employees_count):
+        solution[i][0] = i + 1
+
+    return solution
 
 # Ex : 8h to 0, 9.5h to 3
 def hour_to_solution_index(hour):
@@ -57,6 +74,7 @@ def hour_to_solution_index(hour):
 def has_mission_between(hour1, hour2, employee, solution):
     start_index = hour_to_solution_index(hour1)
     end_index = hour_to_solution_index(hour2)
+
 
     for i in range(start_index, end_index):
         if solution[employee["id"]][i] != 0: return True
@@ -69,7 +87,7 @@ def assign_mission(mission, employee, solution):
     end_index = hour_to_solution_index(mission["end_hour"])
 
     for i in range(start_index, end_index):
-        solution[employee["id"]][i] = mission["id"]
+        solution[employee["id"]][i + 1] = mission["id"]
 
     return True
 
@@ -94,16 +112,22 @@ lcp_missions = [missions[i] for i in range(len(missions)) if missions[i]["skill"
 lsf_employees = [employees[i] for i in range(len(employees)) if employees[i]["skill"] == 0]
 lcp_employees = [employees[i] for i in range(len(employees)) if employees[i]["skill"] == 1]
 
-solutions = []
-for day in range(1, 6):
+population = [[]]
+
+population[0] = init_empty_solution(4)
+
+print_table(lsf_missions)
+
+for day in range(1, 2):
     lsf_day_missions = [lsf_missions[k] for k in range(len(lsf_missions)) if lsf_missions[k]["day"] == day]
     lcp_day_missions = [lcp_missions[k] for k in range(len(lcp_missions)) if lcp_missions[k]["day"] == day]
-
-    print_table(lsf_day_missions)
-    print_table(lsf_employees)
-
-    random.shuffle(lsf_employees)
-
-    for i in range(lsf_employees):
-        assign_mission()
-
+    
+    day_mission_index = 0
+    while day_mission_index < len(lsf_day_missions):
+        random.shuffle(lsf_employees)
+        for i in range(len(lsf_employees)):
+            if assign_mission(lsf_day_missions[day_mission_index], lsf_employees[i], population[0]):
+                break
+        day_mission_index += 1
+    
+    print_solution(population[0])
