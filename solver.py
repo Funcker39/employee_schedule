@@ -3,16 +3,17 @@ import pandas as pd
 import random
 import src.solution as sol
 import src.fitness as fit
+import sys
 
 week_days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi']
 
 csv_dir = r'./csv/45-4/'
-distances_csv = pd.read_csv(csv_dir + r'/Distances.csv', header=None)
+if len(sys.argv) > 1:
+    csv_dir = r'./csv/' + sys.argv[1] + r'/'
+
 missions_csv = pd.read_csv(csv_dir + r'/Missions.csv', header=None).transpose()
 employees_csv = pd.read_csv(csv_dir + r'/Intervenants.csv', header=None).transpose()
-
-def distance_btw_missions(mission1, mission2):
-    return distances_csv[mission1["id"]][mission2["id"]]
+distances = pd.read_csv(csv_dir + r'/Distances.csv', header=None)
 
 missions = []
 for i in range(missions_csv.shape[1]):
@@ -31,9 +32,9 @@ population = [[[]]]
 
 population[0] = sol.init_empty_solution(len(employees))
 
-for day in range(1, 6):
-    lsf_day_missions = [lsf_missions[k] for k in range(len(lsf_missions)) if lsf_missions[k]["day"] == day]
-    lcp_day_missions = [lcp_missions[k] for k in range(len(lcp_missions)) if lcp_missions[k]["day"] == day]
+for day in range(5):
+    lsf_day_missions = [lsf_missions[k] for k in range(len(lsf_missions)) if lsf_missions[k]["day"] == day+1]
+    lcp_day_missions = [lcp_missions[k] for k in range(len(lcp_missions)) if lcp_missions[k]["day"] == day+1]
     
     day_mission_index = 0
     while day_mission_index < len(lsf_day_missions):
@@ -51,9 +52,8 @@ for day in range(1, 6):
                 break
         day_mission_index += 1
     
-    print('\n' + week_days[day-1])
+    print('\n' + week_days[day])
     sol.print_day(population[0][day])
 
 print()
-print(employees)
-print(fit.fitness(population[0], employees))
+print(fit.fitness(population[0], employees, distances))

@@ -9,7 +9,7 @@ def init_empty_day(employees_count):
     return day
 
 def init_empty_solution(employees_count):
-    solution = [init_empty_day(employees_count) for i in range(6)]
+    solution = [init_empty_day(employees_count) for i in range(5)]
 
     return solution
 
