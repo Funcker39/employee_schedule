@@ -6,7 +6,7 @@ import src.fitness as fit
 
 week_days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi']
 
-csv_dir = r'./csv/96-6/'
+csv_dir = r'./csv/45-4/'
 distances_csv = pd.read_csv(csv_dir + r'/Distances.csv', header=None)
 missions_csv = pd.read_csv(csv_dir + r'/Missions.csv', header=None).transpose()
 employees_csv = pd.read_csv(csv_dir + r'/Intervenants.csv', header=None).transpose()
@@ -55,4 +55,5 @@ for day in range(1, 6):
     sol.print_day(population[0][day])
 
 print()
-print(fit.all_lunch_pauses(population[0]))
+print(employees)
+print(fit.fitness(population[0], employees))
