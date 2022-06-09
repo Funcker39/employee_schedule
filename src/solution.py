@@ -61,11 +61,26 @@ def has_mission_between(hour1, hour2, employee, day):
     start_index = hour_to_solution_index(hour1)
     end_index = hour_to_solution_index(hour2)
 
+    if start_index < 1: start_index = 1
+
     for i in range(start_index, end_index):
         if day[employee["id"] - 1][i] != 0: return True
 
-def assign_mission(mission, employee, day):
-    if has_mission_between(mission["start_hour"], mission["end_hour"], employee, day): return False
+def has_mission_before(hour, employee, day):
+    hour_before = hour_to_solution_index(hour)-1
+    print(hour_before)
+    if hour_before < 1 or hour_before >= len(day[0]): return False
+
+    if day[employee["id"] - 1][hour_before] == 0:
+        return False
+    
+    return True
+
+
+def assign_mission(mission, employee, day, require_gap_before = False):
+    start_hour = mission['start_hour']
+    if require_gap_before: start_hour -= 0.5
+    if has_mission_between(start_hour, mission["end_hour"], employee, day): return False
 
     start_index = hour_to_solution_index(mission["start_hour"])
     end_index = hour_to_solution_index(mission["end_hour"])

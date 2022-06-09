@@ -38,18 +38,41 @@ for day in range(5):
     
     day_mission_index = 0
     while day_mission_index < len(lsf_day_missions):
+        day_mission = lsf_day_missions[day_mission_index]
         random.shuffle(lsf_employees)
-        for i in range(len(lsf_employees)):
-            if sol.assign_mission(lsf_day_missions[day_mission_index], lsf_employees[i], population[0][day]):
-                break
+
+        assigned = False
+        trials = 0
+        while not assigned:
+            trials += 1
+            for i in range(len(lsf_employees)):
+                if sol.assign_mission(day_mission, lsf_employees[i], population[0][day], trials < 2):
+                    assigned = True
+                    break
+
+            if trials >= 2 and not assigned:
+                print("Can't generate initial solution")
+                quit()
+
         day_mission_index += 1
     
     day_mission_index = 0
     while day_mission_index < len(lcp_day_missions):
         random.shuffle(lcp_employees)
-        for i in range(len(lcp_employees)):
-            if sol.assign_mission(lcp_day_missions[day_mission_index], lcp_employees[i], population[0][day]):
-                break
+        
+        assigned = False
+        trials = 0
+        while not assigned:
+            trials += 1
+            for i in range(len(lcp_employees)):
+                if sol.assign_mission(lcp_day_missions[day_mission_index], lcp_employees[i], population[0][day], trials < 2):
+                    assigned = True
+                    break
+
+            if trials >= 2 and not assigned:
+                print("Can't generate initial solution")
+                quit()
+        
         day_mission_index += 1
     
     print('\n' + week_days[day])
