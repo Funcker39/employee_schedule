@@ -1,4 +1,7 @@
+from copy import copy
+from random import randrange
 import numpy as np
+import src.fitness as fit
 
 def init_empty_day(employees_count):
     day = [[0 for _ in range(25)] for _ in range(employees_count)]
@@ -76,7 +79,6 @@ def has_mission_before(hour, employee, day):
     
     return True
 
-
 def assign_mission(mission, employee, day, require_gap_before = False):
     start_hour = mission['start_hour']
     if require_gap_before: start_hour -= 0.5
@@ -89,6 +91,18 @@ def assign_mission(mission, employee, day, require_gap_before = False):
         day[employee["id"] - 1][i] = mission["id"]
 
     return True
+
+
+def cross_over(solution1, solution2):
+    child1 = copy(solution1)
+    child2 = copy(solution2)
+
+    cross_day = randrange(5)
+    cross_day = 3
+    child1[cross_day] = solution2[cross_day]
+    child2[cross_day] = solution1[cross_day]
+    return child1, child2
+
 
 def print_table(table):
     for i in range(len(table)):
