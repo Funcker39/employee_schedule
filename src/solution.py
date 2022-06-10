@@ -1,4 +1,5 @@
 from copy import copy
+import random
 from random import randrange
 import numpy as np
 import src.fitness as fit
@@ -92,7 +93,7 @@ def assign_mission(mission, employee, day, require_gap_before = False):
 
     return True
 
-
+#Classic crossover
 def cross_over(solution1, solution2):
     child1 = copy(solution1)
     child2 = copy(solution2)
@@ -102,6 +103,72 @@ def cross_over(solution1, solution2):
     child1[cross_day] = solution2[cross_day]
     child2[cross_day] = solution1[cross_day]
     return child1, child2
+
+
+#Switching 2 employees in 2 solution (not that good)
+def cross_over_improved(solution1, solution2,employees):
+
+    employee1 = random.choice(random.choice(solution1))
+    
+    mandatorySkill = employees[employee1[0]-1]["skill"]
+    
+    compatible_employees = []
+    
+    for employee in solution2[0]:
+        if(employee[0] == employee1[0]):
+            continue
+        if(employees[employee[0]-1]["skill"]==mandatorySkill):
+            compatible_employees.append(employee)
+
+    if(len(compatible_employees)>0):
+        employee2 = random.choice(compatible_employees)
+    else:
+        return solution1,solution2
+    mutation_day = randrange(5)
+    
+    #Switching days
+    solution1[mutation_day][employee1[0]-1]=solution2[mutation_day][employee2[0]-1]
+    solution2[mutation_day][employee2[0]-1]=solution1[mutation_day][employee1[0]-1]    
+
+    
+    return solution1,solution2
+
+
+
+
+
+def mutation (solution,employees):
+
+    employee1 = random.choice(random.choice(solution))
+    
+    mandatorySkill = employees[employee1[0]-1]["skill"]
+    
+    compatible_employees = []
+    
+    for employee in solution[0]:
+        if(employee == employee1):
+            continue
+        if(employees[employee[0]-1]["skill"]==mandatorySkill):
+            compatible_employees.append(employee)
+
+    if(len(compatible_employees)>0):
+        employee2 = random.choice(compatible_employees)
+    else:
+        return solution
+    mutation_day = randrange(5)
+    
+    #Switching days
+    solution[mutation_day][employee1[0]-1]=solution[mutation_day][employee2[0]-1]
+    solution[mutation_day][employee2[0]-1]=solution[mutation_day][employee1[0]-1]    
+
+    
+    return solution
+
+
+
+
+
+
 
 
 def print_table(table):

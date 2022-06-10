@@ -5,7 +5,7 @@ import random
 import src.solution as sol
 import src.fitness as fit
 import sys
-
+import plotly.express as px
 def try_assign_mission(mission, employees, day):
     assigned = False
     trials = 0
@@ -81,6 +81,7 @@ def min_fitness(fitness_val):
 
 lsf_missions = [missions[i] for i in range(len(missions)) if missions[i]["skill"] == 0]
 lcp_missions = [missions[i] for i in range(len(missions)) if missions[i]["skill"] == 1]
+
 lsf_employees = [employees[i] for i in range(len(employees)) if employees[i]["skill"] == 0]
 lcp_employees = [employees[i] for i in range(len(employees)) if employees[i]["skill"] == 1]
 
@@ -145,7 +146,8 @@ print('Generation 0 min =',min_fitness(fitness_values)[0])
 ####
 # Next generations
 ####
-
+xabs=[]
+yabs=[]
 for gen in range(1, generations+1):
     # Elites selection (10% best)
     next_population = []
@@ -155,7 +157,7 @@ for gen in range(1, generations+1):
         fitness_values.pop(index)
         next_population.append(population[sol_id])
         parents.append(population[sol_id])
-    
+
 
     # Parents selection (40% best, elites included)
     for i in range(round(population_size * 0.3)):
@@ -169,7 +171,7 @@ for gen in range(1, generations+1):
     # print_fitnesses(parents)
 
 
-    while len(next_population) < population_size:
+    while len(next_population) < population_size-5:
         parent1 = random.randrange(0, len(parents))
         parent2 = random.randrange(0, len(parents))
 
@@ -180,7 +182,7 @@ for gen in range(1, generations+1):
 
         next_population.append(children[0])
         next_population.append(children[1])
-
+      
         # sol.print_day(parents[parent1][3])
         # print("+")
         # sol.print_day(parents[parent2][3])
@@ -188,6 +190,10 @@ for gen in range(1, generations+1):
         # sol.print_day(children[0][3])
         # sol.print_day(children[1][3])
         # print()
+    while len(next_population)< population_size:
+        index = random.randrange(0,len(parents))
+        muted = sol.mutation(parents[index],employees)
+        next_population.append(muted)
 
     # print()
     # print("Full next gen, length", len(next_population))
@@ -196,6 +202,11 @@ for gen in range(1, generations+1):
     fitness_values = []
     for i in range(population_size):
         fitness_values.append([fit.fitness(population[i], employees, distances, zeta, kappa), i])
-
+    xabs.append(gen)
+    yabs.append(min_fitness(fitness_values)[0])
     print("Generation", gen, "min =", min_fitness(fitness_values)[0])
-    print()
+print()
+
+fig = px.line(x=xabs,y=yabs)
+
+fig.write_html("gen"+str(gen)+"_"+sys.argv[2]+".html",auto_open=True)
