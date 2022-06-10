@@ -6,8 +6,6 @@ import src.solution as sol
 import src.fitness as fit
 import sys
 
-
-
 def try_assign_mission(mission, employees, day):
     assigned = False
     trials = 0
@@ -25,13 +23,15 @@ def try_assign_mission(mission, employees, day):
 
     return True
 
-
-
 week_days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi']
 
-csv_dir = r'./csv/45-4/'
+generations = 10
 if len(sys.argv) > 1:
-    csv_dir = r'./csv/' + sys.argv[1] + r'/'
+    generations = (int)(sys.argv[1])
+
+csv_dir = r'./csv/45-4/'
+if len(sys.argv) > 2:
+    csv_dir = r'./csv/' + sys.argv[2] + r'/'
 
 missions_csv = pd.read_csv(csv_dir + r'/Missions.csv', header=None).transpose()
 employees_csv = pd.read_csv(csv_dir + r'/Intervenants.csv', header=None).transpose()
@@ -146,7 +146,6 @@ print('Generation 0 min =',min_fitness(fitness_values)[0])
 # Next generations
 ####
 
-generations = 2
 for gen in range(1, generations+1):
     # Elites selection (10% best)
     next_population = []
@@ -157,8 +156,6 @@ for gen in range(1, generations+1):
         next_population.append(population[sol_id])
         parents.append(population[sol_id])
     
-    print("Elites")
-    print_fitnesses(next_population)
 
     # Parents selection (40% best, elites included)
     for i in range(round(population_size * 0.3)):
@@ -166,8 +163,10 @@ for gen in range(1, generations+1):
         fitness_values.pop(index)
         parents.append(population[sol_id])
 
-    print("Parents")
-    print_fitnesses(parents)
+    # print("Elites")
+    # print_fitnesses(next_population)
+    # print("Parents")
+    # print_fitnesses(parents)
 
 
     while len(next_population) < population_size:
