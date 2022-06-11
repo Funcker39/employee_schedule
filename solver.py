@@ -34,7 +34,7 @@ if len(sys.argv) > 1:
 
 csv_dir = [r'./csv/45-4/',r'./csv/96-6/',r'./csv/100-10/']
 if len(sys.argv) > 2:
-    csv_dir = r'./csv/' + sys.argv[2] + r'/'
+    csv_dir = [r'./csv/' + sys.argv[2] + r'/']
 for i in range(len(csv_dir)):
     missions_csv = pd.read_csv(csv_dir[i] + r'/Missions.csv', header=None).transpose()
     employees_csv = pd.read_csv(csv_dir[i] + r'/Intervenants.csv', header=None).transpose()
@@ -105,7 +105,7 @@ for i in range(len(csv_dir)):
     lsf_employees = [employees[i] for i in range(len(employees)) if employees[i]["skill"] == 0]
     lcp_employees = [employees[i] for i in range(len(employees)) if employees[i]["skill"] == 1]
 
-    population_size = 100 # better be multiple of 10
+    population_size = 50 # better be multiple of 10
     population = []
     fitness_values = [[] for i in range(population_size)]
 
@@ -191,7 +191,7 @@ for i in range(len(csv_dir)):
             # 50% chance of generating new random solution /
             # 50% chance of taking a good solution
             #if random.randrange(2) == 0: parents.append(population[sol_id])
-            if random.randrange(100) >= 30: parents.append(wheel(population,const_fitness_values))
+            if random.randrange(100) >= 90: parents.append(wheel(population,const_fitness_values))
             else: parents.append(generate_solution()[0])
 
 
@@ -266,5 +266,7 @@ fig.add_trace(
         name="100-10"
     )
 )
+fig.update_xaxes(title_text="Generation")
+fig.update_yaxes(title_text="Valeur Fitness")
 fig.show()
     #fig.write_html("./plots/gen"+str(gen)+"_"+sys.argv[2]+".html",auto_open=True)

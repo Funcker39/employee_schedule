@@ -188,5 +188,16 @@ def fitness(solution, employees, distances, zeta, kappa):
 
     score += f_employees
                 
+    #2.Missions affectation
+    
+
+
+
+
+
+
+
+
+
 
     return score
