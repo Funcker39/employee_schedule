@@ -106,32 +106,38 @@ def cross_over(solution1, solution2):
 
 
 #Crossover switching 2 employees in 2 solution (not that good)
-def cross_over_improved(solution1, solution2,employees):
+def cross_over_impr (solution1,solution2,lsf_employees, lcp_employees):
 
-    employee1 = random.choice(random.choice(solution1))
-    
-    mandatorySkill = employees[employee1[0]-1]["skill"]
-    
-    compatible_employees = []
-    
-    for employee in solution2[0]:
-        if(employee[0] == employee1[0]):
-            continue
-        if(employees[employee[0]-1]["skill"]==mandatorySkill):
-            compatible_employees.append(employee)
+    new_solution1 = deepcopy(solution1)
+    new_solution2 = deepcopy(solution2)
 
-    if(len(compatible_employees)>0):
-        employee2 = random.choice(compatible_employees)
-    else:
-        return solution1,solution2
     mutation_day = randrange(5)
-    
-    #Switching days
-    solution1[mutation_day][employee1[0]-1]=solution2[mutation_day][employee2[0]-1]
-    solution2[mutation_day][employee2[0]-1]=solution1[mutation_day][employee1[0]-1]    
 
-    
-    return solution1,solution2
+    skill = random.randrange(2)
+
+    if skill == 0:
+        employee1_ind = random.choice(lsf_employees)["id"]-1
+    else:
+        employee1_ind = random.choice(lcp_employees)["id"]-1
+
+    if skill == 0:
+        employee_list = deepcopy(lsf_employees)
+    else:
+        employee_list = deepcopy(lcp_employees)
+    random.shuffle(employee_list)
+
+    for employee in employee_list:
+        if(employee["id"] == employee1_ind+1):
+            continue
+        employee2_ind = employee["id"]-1
+        break
+
+    #Switching days
+    for hour in range(1, len(solution1[0][0])):
+        new_solution1[mutation_day][employee1_ind][hour] = solution2[mutation_day][employee2_ind][hour]
+        new_solution2[mutation_day][employee2_ind][hour] = solution1[mutation_day][employee1_ind][hour]
+
+    return [new_solution1, new_solution2]
 
 def mutation (solution,lsf_employees, lcp_employees):
 
