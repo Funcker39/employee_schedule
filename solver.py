@@ -76,6 +76,28 @@ def min_fitness(fitness_val):
     
     return min, solution_id, index
 
+def wheel(population,employees,distances,zeta,kappa):
+    fitness_values = []
+    for i in range(len(population)):
+        
+        fitness_values.append([fit.fitness(population[i], employees, distances, zeta, kappa), i])
+    values=[]
+    proba=[]
+
+    for element in fitness_values:
+        values.append(element[0])
+
+    for val in values:
+        proba.append(len(population)/val)
+
+    choosed_solution = values.index(random.choices(values,weights=proba, cum_weights=None,k=1)[0])
+
+    return population[fitness_values[choosed_solution][1]]
+
+
+
+
+
 ####
 # First generation
 ####
@@ -180,10 +202,10 @@ for gen in range(1, generations+1):
     while len(parents) < population_size * 0.4:
         val, sol_id, index = min_fitness(fitness_values)
         fitness_values.pop(index)
-
+       
         # 50% chance of generating new random solution /
         # 50% chance of taking a good solution
-        if random.randrange(2) == 0: parents.append(population[sol_id])
+        if random.randrange(2) == 0: parents.append(wheel(population,employees,distances,zeta,kappa))
         else: parents.append(generate_solution()[0])
 
 
@@ -230,13 +252,13 @@ for gen in range(1, generations+1):
     for i in range(population_size):
         population[i] = copy.deepcopy(next_population[i])
         fitness_values.append([fit.fitness(population[i], employees, distances, zeta, kappa), i])
-
+ 
     min_sol = min_fitness(fitness_values)
     xabs.append(gen)
     yabs.append(min_sol[0])
     # sol.print_week(population[min_sol[1]])
     print("Generation", gen, "min =", min_sol[0]) 
-
+    
 print()
 # sol.print_week(population[min_sol[1]])
 # print_fitness(population[0])
