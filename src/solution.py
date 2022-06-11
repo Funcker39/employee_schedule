@@ -1,4 +1,4 @@
-from copy import copy
+from copy import copy, deepcopy
 import random
 from random import randrange
 import numpy as np
@@ -93,7 +93,7 @@ def assign_mission(mission, employee, day, require_gap_before = False):
 
     return True
 
-#Classic crossover
+#Crossover of 1 day
 def cross_over(solution1, solution2):
     child1 = copy(solution1)
     child2 = copy(solution2)
@@ -105,7 +105,7 @@ def cross_over(solution1, solution2):
     return child1, child2
 
 
-#Switching 2 employees in 2 solution (not that good)
+#Crossover switching 2 employees in 2 solution (not that good)
 def cross_over_improved(solution1, solution2,employees):
 
     employee1 = random.choice(random.choice(solution1))
@@ -133,43 +133,47 @@ def cross_over_improved(solution1, solution2,employees):
     
     return solution1,solution2
 
+def mutation (solution,lsf_employees, lcp_employees):
 
+    new_solution = deepcopy(solution)
 
-
-
-def mutation (solution,employees):
-
-    employee1 = random.choice(random.choice(solution))
-    
-    mandatorySkill = employees[employee1[0]-1]["skill"]
-    
-    compatible_employees = []
-    
-    for employee in solution[0]:
-        if(employee == employee1):
-            continue
-        if(employees[employee[0]-1]["skill"]==mandatorySkill):
-            compatible_employees.append(employee)
-
-    if(len(compatible_employees)>0):
-        employee2 = random.choice(compatible_employees)
-    else:
-        return solution
     mutation_day = randrange(5)
+
+    skill = random.randrange(2)
+
+    if skill == 0:
+        employee1_ind = random.choice(lsf_employees)["id"]-1
+    else:
+        employee1_ind = random.choice(lcp_employees)["id"]-1
     
+    if skill == 0:
+        employee_list = deepcopy(lsf_employees)
+    else:
+        employee_list = deepcopy(lcp_employees)
+    random.shuffle(employee_list)
+
+    for employee in employee_list:
+        if(employee["id"] == employee1_ind+1):
+            continue
+        employee2_ind = employee["id"]-1
+        break
+
+    
+    # print()
+    # print(solution[mutation_day][employee2_ind],solution[mutation_day][employee1_ind]  )
+    # print("Muting :")
+    # print_day(solution[mutation_day])
+
     #Switching days
-    solution[mutation_day][employee1[0]-1]=solution[mutation_day][employee2[0]-1]
-    solution[mutation_day][employee2[0]-1]=solution[mutation_day][employee1[0]-1]    
+    for hour in range(1, len(solution[0][0])):
+        new_solution[mutation_day][employee1_ind][hour] = solution[mutation_day][employee2_ind][hour]
+        new_solution[mutation_day][employee2_ind][hour] = solution[mutation_day][employee1_ind][hour]
+  
+    # print("Into :")
+    # print_day(new_solution[mutation_day])
 
     
-    return solution
-
-
-
-
-
-
-
+    return new_solution
 
 def print_table(table):
     for i in range(len(table)):
@@ -187,3 +191,7 @@ def print_day(day):
     table = [fmt.format(*row) for row in s]
     print ('\n'.join(table))
     return
+
+def print_week(solution):
+    for i in range(len(solution)):
+        print_day(solution[i])

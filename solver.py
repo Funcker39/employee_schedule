@@ -1,4 +1,5 @@
 from cgi import print_exception
+import copy
 import numpy as np
 import pandas as pd
 import random
@@ -142,12 +143,15 @@ for solution_id in range(population_size):
 
 print('Generation 0 min =',min_fitness(fitness_values)[0])
 
+# sol.print_week(population[0])
+# print_fitness(population[0])
 
 ####
 # Next generations
 ####
 xabs=[]
 yabs=[]
+min_sol = 0
 for gen in range(1, generations+1):
     # Elites selection (10% best)
     next_population = []
@@ -164,11 +168,6 @@ for gen in range(1, generations+1):
         val, sol_id, index = min_fitness(fitness_values)
         fitness_values.pop(index)
         parents.append(population[sol_id])
-
-    # print("Elites")
-    # print_fitnesses(next_population)
-    # print("Parents")
-    # print_fitnesses(parents)
 
 
     while len(next_population) < population_size-5:
@@ -192,7 +191,7 @@ for gen in range(1, generations+1):
         # print()
     while len(next_population)< population_size:
         index = random.randrange(0,len(parents))
-        muted = sol.mutation(parents[index],employees)
+        muted = sol.mutation(parents[index],lsf_employees, lcp_employees)
         next_population.append(muted)
 
     # print()
@@ -202,11 +201,18 @@ for gen in range(1, generations+1):
     fitness_values = []
     for i in range(population_size):
         fitness_values.append([fit.fitness(population[i], employees, distances, zeta, kappa), i])
+        population[i] = copy.deepcopy(next_population[i])
+
+    min_sol = min_fitness(fitness_values)
     xabs.append(gen)
-    yabs.append(min_fitness(fitness_values)[0])
-    print("Generation", gen, "min =", min_fitness(fitness_values)[0])
+    yabs.append(min_sol[0])
+    # sol.print_week(population[min_sol[1]])
+    print("Generation", gen, "min =", min_sol[0]) 
+
 print()
+# sol.print_week(population[0])
+# print_fitness(population[0])
 
 fig = px.line(x=xabs,y=yabs)
 
-fig.write_html("./plots/gen"+str(gen)+"_"+sys.argv[2]+".html",auto_open=True)
+#fig.write_html("./plots/gen"+str(gen)+"_"+sys.argv[2]+".html",auto_open=True)
