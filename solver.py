@@ -209,4 +209,4 @@ print()
 
 fig = px.line(x=xabs,y=yabs)
 
-fig.write_html("gen"+str(gen)+"_"+sys.argv[2]+".html",auto_open=True)
+fig.write_html("./plots/gen"+str(gen)+"_"+sys.argv[2]+".html",auto_open=True)
