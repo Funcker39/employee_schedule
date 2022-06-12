@@ -112,7 +112,7 @@ def avg(values):
     return sum
 
 
-def fitness(solution, employees, missions, distances, zeta, kappa,alpha):
+def fitness(solution, employees, missions, distances, zeta, kappa,alpha,beta):
 
     ###
     # HARD CONSTRAINTS
@@ -203,5 +203,21 @@ def fitness(solution, employees, missions, distances, zeta, kappa,alpha):
                         penalties += 1
 
     score += alpha * penalties
+
+    #3.Sessad Criterai (distances)
+    #sumWOH = sum(week_extra_hours)+sum(wasted_hours)
+    #f_sessad = (beta  * sumWOH + kappa*avg_employee_distances + kappa * all_employee_distances)/3
+    #score+=f_sessad
+
+
+
+
+
+
+
+
+
+
+
 
     return score

@@ -58,10 +58,10 @@ for i in range(len(csv_dir)):
     kappa = 100 / (sum / len(employees))
     
     alpha = 100 / len(missions)
-
+    beta  = 100 /45
 
     def print_fitness(solution):
-        print(fit.fitness(solution, employees, distances, missions, zeta, kappa,alpha))
+        print(fit.fitness(solution, employees, distances, missions, zeta, kappa,alpha,beta))
 
     def print_fitnesses(solutions):
         for i in range(len(solutions)):
@@ -141,7 +141,7 @@ for i in range(len(csv_dir)):
 
                     day_mission_index += 1
                 
-            fitness_val = [fit.fitness(solution, employees, missions, distances, zeta, kappa, alpha), solution_id]
+            fitness_val = [fit.fitness(solution, employees, missions, distances, zeta, kappa, alpha,beta), solution_id]
 
             if fitness_val[0] >= 0:
                 valid_solution = True
@@ -228,7 +228,7 @@ for i in range(len(csv_dir)):
         fitness_values = []
         for i in range(population_size):
             population[i] = copy.deepcopy(next_population[i])
-            fitness_values.append([fit.fitness(population[i], employees, missions, distances, zeta, kappa,alpha), i])
+            fitness_values.append([fit.fitness(population[i], employees, missions, distances, zeta, kappa,alpha,beta), i])
         const_fitness_values = copy.deepcopy(fitness_values)
     
         min_sol = min_fitness(fitness_values)
@@ -241,7 +241,7 @@ for i in range(len(csv_dir)):
     
     xdatas.append(xabs)
     ydatas.append(yabs)
-
+    sol.print_week(population[min_sol[1]])
 
 fig = go.Figure()
 fig.add_trace(
