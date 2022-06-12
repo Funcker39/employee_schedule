@@ -112,7 +112,7 @@ def avg(values):
     return sum
 
 
-def fitness(solution, employees, distances, zeta, kappa):
+def fitness(solution, employees, missions, distances, zeta, kappa,alpha):
 
     ###
     # HARD CONSTRAINTS
@@ -153,19 +153,19 @@ def fitness(solution, employees, distances, zeta, kappa):
     week_distances = []
     all_employee_distances = 0
     all_employee_wasted_hours = 0
-    last_mission = 0
+    last_mission_id = 0
     for employee_ind in range(len(solution[0])):
         employee_wasted_hours = 0
         week_dis = 0
         for day in range(len(solution)):
             for hour in range(len(solution[0][0])):
-                mission = solution[day][employee_ind][hour]
-                if mission == 0:
+                mission_id = solution[day][employee_ind][hour]
+                if mission_id == 0:
                     employee_wasted_hours += 0.5
                     all_employee_wasted_hours += 0.5
-                elif mission != last_mission:
-                    week_dis += distances[last_mission][mission]
-            week_dis += distances[last_mission][0]
+                elif mission_id != last_mission_id:
+                    week_dis += distances[last_mission_id][mission_id]
+            week_dis += distances[last_mission_id][0]
 
         all_employee_distances += week_dis
         week_distances.append(week_dis)
@@ -188,16 +188,20 @@ def fitness(solution, employees, distances, zeta, kappa):
 
     score += f_employees
                 
-    #2.Missions affectation
+
+    #2.Missions/employees speciality match
     
+    penalties = 0
+    last_mission_id = 0
+    for day in range(len(solution)):
+        for employee_ind in range(len(solution[0])):
+            for hour in range(1,len(solution[0][0])):
+                mission_id = solution[day][employee_ind][hour]
+                if mission_id != last_mission_id and mission_id != 0:
+                    last_mission_id = mission_id
+                    if missions[mission_id-1]["spe"] != employees[solution[day][employee_ind][0]-1]["spe"]:
+                        penalties += 1
 
-
-
-
-
-
-
-
-
+    score += alpha * penalties
 
     return score

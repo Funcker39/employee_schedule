@@ -1,4 +1,3 @@
-from cgi import print_exception
 import copy
 import numpy as np
 import pandas as pd
@@ -57,10 +56,12 @@ for i in range(len(csv_dir)):
     for i in range(len(distances)):
         sum += distances[0][i] * 2
     kappa = 100 / (sum / len(employees))
+    
+    alpha = 100 / len(missions)
 
 
     def print_fitness(solution):
-        print(fit.fitness(solution, employees, distances, zeta, kappa))
+        print(fit.fitness(solution, employees, distances, missions, zeta, kappa,alpha))
 
     def print_fitnesses(solutions):
         for i in range(len(solutions)):
@@ -140,7 +141,7 @@ for i in range(len(csv_dir)):
 
                     day_mission_index += 1
                 
-            fitness_val = [fit.fitness(solution, employees, distances, zeta, kappa), solution_id]
+            fitness_val = [fit.fitness(solution, employees, missions, distances, zeta, kappa, alpha), solution_id]
 
             if fitness_val[0] >= 0:
                 valid_solution = True
@@ -185,13 +186,11 @@ for i in range(len(csv_dir)):
 
         # Parents selection (40% best, elites included)
         while len(parents) < population_size * 0.4:
-            val, sol_id, index = min_fitness(fitness_values)
-            fitness_values.pop(index)
+            # val, sol_id, index = min_fitness(fitness_values)
+            # fitness_values.pop(index)
         
-            # 50% chance of generating new random solution /
-            # 50% chance of taking a good solution
-            #if random.randrange(2) == 0: parents.append(population[sol_id])
-            if random.randrange(100) >= 90: parents.append(wheel(population,const_fitness_values))
+            # 60 % wheel selection / 40 % new random solution
+            if random.randrange(100) >= 60: parents.append(wheel(population,const_fitness_values))
             else: parents.append(generate_solution()[0])
 
 
@@ -229,7 +228,7 @@ for i in range(len(csv_dir)):
         fitness_values = []
         for i in range(population_size):
             population[i] = copy.deepcopy(next_population[i])
-            fitness_values.append([fit.fitness(population[i], employees, distances, zeta, kappa), i])
+            fitness_values.append([fit.fitness(population[i], employees, missions, distances, zeta, kappa,alpha), i])
         const_fitness_values = copy.deepcopy(fitness_values)
     
         min_sol = min_fitness(fitness_values)
@@ -252,20 +251,22 @@ fig.add_trace(
         name = "45-4"
     )
 )
-fig.add_trace(
-    go.Scatter(
-        x=xdatas[1],
-        y=ydatas[1],
-        name = "96-6"
+if (len(xdatas) > 1):
+    fig.add_trace(
+        go.Scatter(
+            x=xdatas[1],
+            y=ydatas[1],
+            name = "96-6"
+        )
     )
-)
-fig.add_trace(
-    go.Scatter(
-        x=xdatas[2],
-        y=ydatas[2],
-        name="100-10"
+    fig.add_trace(
+        go.Scatter(
+            x=xdatas[2],
+            y=ydatas[2],
+            name="100-10"
+        )
     )
-)
+
 fig.update_xaxes(title_text="Generation")
 fig.update_yaxes(title_text="Valeur Fitness")
 fig.show()
