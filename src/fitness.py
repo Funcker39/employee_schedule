@@ -134,6 +134,7 @@ def fitness(solution, employees, missions, distances, zeta, kappa,alpha,beta):
         employee_extra_hours = extra_hours(solution, employee_ind, employees, distances)
         debug(employee_extra_hours)
         week_extra_hours_ = employee_extra_hours[0] - employees[employee_ind]['quota']
+        if week_extra_hours_ < 0: week_extra_hours_ = 0
         for i in range(len(employee_extra_hours[1])):
             if employee_extra_hours[1][i] > 120 or week_extra_hours_ > 10:
                 debug('The employee #' + str(employee_ind + 1) + ' has too much extra hours')
@@ -152,6 +153,7 @@ def fitness(solution, employees, missions, distances, zeta, kappa,alpha,beta):
     wasted_hours = []
     week_distances = []
     all_employee_distances = 0
+    employee_distances = []
     all_employee_wasted_hours = 0
     last_mission_id = 0
     for employee_ind in range(len(solution[0])):
@@ -167,10 +169,11 @@ def fitness(solution, employees, missions, distances, zeta, kappa,alpha,beta):
                     week_dis += distances[last_mission_id][mission_id]
             week_dis += distances[last_mission_id][0]
 
-        all_employee_distances += week_dis
+        employee_distances.append(week_dis)
         week_distances.append(week_dis)
         wasted_hours.append(employee_wasted_hours)
 
+    all_employee_distances = sum(employee_distances)
     avg_wasted_hours = all_employee_wasted_hours / len(solution[0])
     sigma_wasted_hours = standard_deviation(wasted_hours, avg_wasted_hours)
 
@@ -205,19 +208,8 @@ def fitness(solution, employees, missions, distances, zeta, kappa,alpha,beta):
     score += alpha * penalties
 
     #3.Sessad Criterai (distances)
-    #sumWOH = sum(week_extra_hours)+sum(wasted_hours)
-    #f_sessad = (beta  * sumWOH + kappa*avg_employee_distances + kappa * all_employee_distances)/3
-    #score+=f_sessad
-
-
-
-
-
-
-
-
-
-
-
+    sumWOH = sum(week_extra_hours)+sum(wasted_hours)
+    f_sessad = (beta  * sumWOH + kappa*avg_employee_distances + kappa * max(employee_distances))/3
+    score+=f_sessad
 
     return score

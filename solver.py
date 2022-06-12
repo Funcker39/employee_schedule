@@ -7,6 +7,7 @@ import src.fitness as fit
 import sys
 import plotly.graph_objects as go
 
+
 def try_assign_mission(mission, employees, day):
     assigned = False
     trials = 0
@@ -23,6 +24,9 @@ def try_assign_mission(mission, employees, day):
             return False
 
     return True
+
+
+
 
 week_days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi']
 xdatas=[]
@@ -59,6 +63,8 @@ for i in range(len(csv_dir)):
     
     alpha = 100 / len(missions)
     beta  = 100 /45
+
+
 
     def print_fitness(solution):
         print(fit.fitness(solution, employees, distances, missions, zeta, kappa,alpha,beta))
@@ -106,10 +112,11 @@ for i in range(len(csv_dir)):
     lsf_employees = [employees[i] for i in range(len(employees)) if employees[i]["skill"] == 0]
     lcp_employees = [employees[i] for i in range(len(employees)) if employees[i]["skill"] == 1]
 
-    population_size = 50 # better be multiple of 10
+    population_size = 200 # better be multiple of 10
     population = []
     fitness_values = [[] for i in range(population_size)]
 
+    
     def generate_solution():
         valid_solution = False
         while not valid_solution:
