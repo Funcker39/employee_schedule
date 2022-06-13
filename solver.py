@@ -28,16 +28,28 @@ def try_assign_mission(mission, employees, day):
 xdatas=[]
 ydatas=[]
 generations = 10
-if len(sys.argv) > 1:
-    generations = (int)(sys.argv[1])
 time_limit = 0
+if len(sys.argv) > 1:
+    generations = (int)(sys.argv[2])
+    time_limit = (int)(sys.argv[3])
 
 csv_dir = [r'./csv/45-4/',r'./csv/96-6/',r'./csv/100-10/']
-if len(sys.argv) > 2:
-    csv_dir = [r'./csv/' + sys.argv[2] + r'/']
+if len(sys.argv) > 1:
+    csv_dir = [r'./csv/' + sys.argv[1] + r'/']
 for i in range(len(csv_dir)):
+    print("Recherche du meilleur planning avec les données du sous-dossier", csv_dir[i])
+    if time_limit > 0:
+        print("Limite de temps :", str(time_limit) + "s")
+    else:
+        print("Nombre de générations : " + str(generations))
+
+    population_size = 200 # better be multiple of 10
+    if (len(sys.argv) > 4):
+        population_size = (int)(sys.argv[4])
+    print("Population n=" + str(population_size))
+    print()
+
     start_time = time.time()
-    print(start_time)
     missions_csv = pd.read_csv(csv_dir[i] + r'/Missions.csv', header=None).transpose()
     employees_csv = pd.read_csv(csv_dir[i] + r'/Intervenants.csv', header=None).transpose()
     distances = pd.read_csv(csv_dir[i] + r'/Distances.csv', header=None)
@@ -111,7 +123,6 @@ for i in range(len(csv_dir)):
     lsf_employees = [employees[i] for i in range(len(employees)) if employees[i]["skill"] == 0]
     lcp_employees = [employees[i] for i in range(len(employees)) if employees[i]["skill"] == 1]
 
-    population_size = 200 # better be multiple of 10
     population = []
     fitness_values = [[] for i in range(population_size)]
 
