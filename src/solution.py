@@ -280,6 +280,8 @@ def print_day(day):
     return
 
 
+week_days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi']
 def print_week(solution):
     for i in range(len(solution)):
+        print(week_days[i])
         print_day(solution[i])

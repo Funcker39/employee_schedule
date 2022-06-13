@@ -111,6 +111,63 @@ def avg(values):
     sum /= len(values)
     return sum
 
+def compute_f_employee(solution, distances, employees, week_extra_hours, zeta, kappa):
+    wasted_hours = []
+    week_distances = []
+    all_employee_distances = 0
+    employee_distances = []
+    all_employee_wasted_hours = 0
+    last_mission_id = 0
+    for employee_ind in range(len(solution[0])):
+        employee_wasted_hours = 0
+        week_dis = 0
+        for day in range(len(solution)):
+            for hour in range(len(solution[0][0])):
+                mission_id = solution[day][employee_ind][hour]
+                if mission_id == 0:
+                    employee_wasted_hours += 0.5
+                    all_employee_wasted_hours += 0.5
+                elif mission_id != last_mission_id:
+                    week_dis += distances[last_mission_id][mission_id]
+            week_dis += distances[last_mission_id][0]
+
+        employee_distances.append(week_dis)
+        week_distances.append(week_dis)
+        wasted_hours.append(employee_wasted_hours)
+
+    all_employee_distances = sum(employee_distances)
+    avg_wasted_hours = all_employee_wasted_hours / len(solution[0])
+    sigma_wasted_hours = standard_deviation(wasted_hours, avg_wasted_hours)
+
+    avg_employee_distances = all_employee_distances / len(employees)
+    sigma_employee_distances = standard_deviation(week_distances, avg_employee_distances)
+
+    gamma = 10
+    avg_extra_hours = avg(week_extra_hours)
+    sigma_extra_hours = standard_deviation(week_extra_hours, avg_extra_hours)
+
+    debug(zeta * sigma_wasted_hours, gamma * sigma_extra_hours, kappa * sigma_employee_distances)
+
+    return (zeta * sigma_wasted_hours + gamma * sigma_extra_hours + kappa * sigma_employee_distances) / 3
+
+def compute_penalties(solution, employees, missions, alpha):
+    penalties = 0
+    last_mission_id = 0
+    for day in range(len(solution)):
+        for employee_ind in range(len(solution[0])):
+            for hour in range(1,len(solution[0][0])):
+                mission_id = solution[day][employee_ind][hour]
+                if mission_id != last_mission_id and mission_id != 0:
+                    last_mission_id = mission_id
+                    if missions[mission_id-1]["spe"] != employees[solution[day][employee_ind][0]-1]["spe"]:
+                        penalties += 1
+
+    return alpha * penalties
+
+def compute_f_sessad(week_extra_hours, wasted_hours, beta, kappa, avg_employee_distances, employee_distances):
+    sumWOH = sum(week_extra_hours)+sum(wasted_hours)
+    return (beta  * sumWOH + kappa*avg_employee_distances + kappa * max(employee_distances))/3
+
 
 def fitness(solution, employees, missions, distances, zeta, kappa,alpha,beta):
 
@@ -150,6 +207,7 @@ def fitness(solution, employees, missions, distances, zeta, kappa,alpha,beta):
     score = 0
 
     # 1. Work share between employees
+    
     wasted_hours = []
     week_distances = []
     all_employee_distances = 0
@@ -184,32 +242,14 @@ def fitness(solution, employees, missions, distances, zeta, kappa,alpha,beta):
     avg_extra_hours = avg(week_extra_hours)
     sigma_extra_hours = standard_deviation(week_extra_hours, avg_extra_hours)
 
-    debug(zeta * sigma_wasted_hours, gamma * sigma_extra_hours, kappa * sigma_employee_distances)
-
-    f_employees = (zeta * sigma_wasted_hours + gamma * sigma_extra_hours + kappa * sigma_employee_distances) / 3
-    debug(f_employees)
-
-    score += f_employees
-                
+    score += (zeta * sigma_wasted_hours + gamma * sigma_extra_hours + kappa * sigma_employee_distances) / 3
 
     #2.Missions/employees speciality match
-    
-    penalties = 0
-    last_mission_id = 0
-    for day in range(len(solution)):
-        for employee_ind in range(len(solution[0])):
-            for hour in range(1,len(solution[0][0])):
-                mission_id = solution[day][employee_ind][hour]
-                if mission_id != last_mission_id and mission_id != 0:
-                    last_mission_id = mission_id
-                    if missions[mission_id-1]["spe"] != employees[solution[day][employee_ind][0]-1]["spe"]:
-                        penalties += 1
 
-    score += alpha * penalties
+    score += compute_penalties(solution, employees, missions, alpha)
 
     #3.Sessad Criterai (distances)
-    sumWOH = sum(week_extra_hours)+sum(wasted_hours)
-    f_sessad = (beta  * sumWOH + kappa*avg_employee_distances + kappa * max(employee_distances))/3
-    score+=f_sessad
+
+    score += compute_f_sessad(week_extra_hours, wasted_hours, beta, kappa, avg_employee_distances, employee_distances)
 
     return score

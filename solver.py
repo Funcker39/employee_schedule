@@ -1,12 +1,11 @@
 import copy
-import numpy as np
 import pandas as pd
 import random
 import src.solution as sol
 import src.fitness as fit
 import sys
 import plotly.graph_objects as go
-
+import time
 
 def try_assign_mission(mission, employees, day):
     assigned = False
@@ -26,19 +25,19 @@ def try_assign_mission(mission, employees, day):
     return True
 
 
-
-
-week_days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi']
 xdatas=[]
 ydatas=[]
 generations = 10
 if len(sys.argv) > 1:
     generations = (int)(sys.argv[1])
+time_limit = 0
 
 csv_dir = [r'./csv/45-4/',r'./csv/96-6/',r'./csv/100-10/']
 if len(sys.argv) > 2:
     csv_dir = [r'./csv/' + sys.argv[2] + r'/']
 for i in range(len(csv_dir)):
+    start_time = time.time()
+    print(start_time)
     missions_csv = pd.read_csv(csv_dir[i] + r'/Missions.csv', header=None).transpose()
     employees_csv = pd.read_csv(csv_dir[i] + r'/Intervenants.csv', header=None).transpose()
     distances = pd.read_csv(csv_dir[i] + r'/Distances.csv', header=None)
@@ -179,6 +178,8 @@ for i in range(len(csv_dir)):
     yabs=[]
     min_sol = 0
     const_fitness_values = copy.deepcopy(fitness_values)
+
+    if time_limit > 0: generations = 9999999999
     for gen in range(1, generations+1):
 
         # Elites selection (10% best)
@@ -243,6 +244,9 @@ for i in range(len(csv_dir)):
         yabs.append(min_sol[0])
         # sol.print_week(population[min_sol[1]])
         print("Generation", gen, "min =", min_sol[0]) 
+
+        if time_limit > 0 and time.time() - start_time >= time_limit:
+            break
         
     print()
     
